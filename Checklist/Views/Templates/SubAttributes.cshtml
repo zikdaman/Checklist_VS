@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Checklist.Models.SubAttributeDefinition>
+
+@{
+    ViewBag.Title = "SubAttributes";
+}
+
+<h2>SubAttributes</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.AttributeDefinition.AttributeType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SubAttributeType)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.AttributeDefinition.AttributeType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SubAttributeType)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.SubAttributeID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.SubAttributeID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.SubAttributeID })
+        </td>
+    </tr>
+}
+
+</table>

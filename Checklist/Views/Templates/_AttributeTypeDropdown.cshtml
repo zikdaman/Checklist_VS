@@ -1,0 +1,8 @@
+﻿@{ Layout = null; }
+
+@model List<Checklist.Models.AttributeDefinition>
+
+@Html.DropDownList("attributeTypesDropdown", new SelectList(Model, "AttributeType", "AttributeType"), 
+    "Add New Field", 
+    new { @class = "form-control"} )
+

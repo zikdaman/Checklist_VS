@@ -1,0 +1,23 @@
+﻿@model Checklist.Models.AttributeExtension
+
+@{
+    string  prefix="[prefixHere].";
+    if(ViewBag.prefix != null)
+    {
+        prefix = ViewBag.prefix;
+    }
+}
+
+@using (Html.BeginCollectionItem(prefix+"AttributeExtensions"))
+{
+    <div class="form-group row">
+        @Html.HiddenFor(m=>m.TemplateAttributeID)
+        @Html.HiddenFor(m=>m.AttributeExtentionID)
+        <span class="col-md-10">
+            @Html.EditorFor(m=>m.AttributeExtentionData, new { htmlAttributes = new {@class="form-control", @placeholder="Enter List Option"}})
+            @Html.ValidationMessageFor(m => m.AttributeExtentionData, "", new { @class="text-danger"})
+        </span>
+    </div>
+
+}
+            

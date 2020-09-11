@@ -1,0 +1,186 @@
+﻿@model IEnumerable<Checklist.Models.Template>
+
+@{
+    ViewBag.Title = "Checklist Templates";
+}
+
+<h2>Checklist Templates</h2>
+
+<p>
+    @*@Html.ActionLink("Add New Template", "Create", null, new { @class = "btn btn-primary fas fas-plus" })*@
+    <a href="" class="btn btn-primary" id="createBtn">
+        <span class="fa fa-plus"></span>
+        Add New Template
+    </a>
+</p>
+<table class="table table-bordered table-striped" id="templatesTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TemplateName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ModifiedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ModifiedDate)
+            </th>
+            <th data-sortable="false"></th>
+        </tr>
+    </thead>
+
+    <tbody id="templatesTableBody">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TemplateName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedBy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModifiedBy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModifiedDate)
+                </td>
+                <td>
+                    @*@Html.ActionLink("Edit", "Edit", new { id = item.TemplateID }, new { @class = "btn btn-primary btn-sm" }) |*@
+                    <a href="#" class="btn btn-primary btn-sm editBtn" id="edit_@item.TemplateID"><span class="fa fa-pencil"></span></a>
+                    <a href="#" class="btn btn-primary btn-sm detailsBtn" id="details_@item.TemplateID"><span class="fa fa-list"></span></a>
+                    <a href="#" class="btn btn-primary btn-sm deleteBtn"id="delete_@item.TemplateID"><span class="fa fa-trash"></span></a>
+                    @*@Html.ActionLink("Details", "Details", new { id = item.TemplateID }, new { @class = "btn btn-primary btn-sm" }) |
+        @Html.ActionLink("Delete", "Delete", new { id = item.TemplateID }, new { @class = "btn btn-primary btn-sm" })*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts{
+    <link href="//cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+            integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+            crossorigin="anonymous"></script>
+    <script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js" integrity="sha512-8vfyGnaOX2EeMypNMptU+MwwK206Jk1I/tMQV4NkhOz+W8glENoMhGyU6n/6VgQUhQcJH8NqQgHhMtZjJJBv3A==" crossorigin="anonymous"></script>
+    <script src="//use.fontawesome.com/5dc216fa78.js"></script>
+
+    <script>
+        var Popup;
+        $(document).ready(function () {
+            $('#templatesTable').DataTable();
+        });
+
+        $('.closeBtn').click(function () {
+            bootbox.hideAll();
+            console.log('hide');
+        })
+
+        $('#createBtn').click(function () {
+            var title='Create New Template'
+            PopupCreate("@Url.Action("Create", "Templates")",title);
+            return false;
+        })
+
+        function getTitle(el) {
+            var title = '';
+            if (el.hasClass('editBtn')) {
+                title = 'Edit';
+            }
+            else if(el.hasClass('deleteBtn')) {
+                title = 'Delete';
+            }
+            else if(el.hasClass('createBtn')){
+                title = 'Create';
+            }
+            title += ' Template';
+            return title;
+        }
+
+        function getId(el) {
+            var id = el.attr('id');
+            id = id.slice(id.indexOf('_') + 1);
+            return id;
+        }
+
+        $('.editBtn').click(function () {
+            var el = $(this);
+            var title = getTitle(el);
+            var id = getId(el);
+            PopupCreate("@Url.Action("Edit", "Templates")?id=" + id, title);
+
+        })
+
+        $('.deleteBtn').click(function () {
+            var el = $(this);
+            var title = getTitle(el);
+            var id = getId(el);
+            PopupCreate("@Url.Action("Delete", "Templates")?id=" + id, title);
+        })
+
+        $('.detailsBtn').click(function () {
+            var el = $(this);
+            var title = getTitle(el);
+            var id = getId(el);
+            PopupCreate("@Url.Action("Details", "Templates")?id=" + id, title);
+        })
+
+        function PopupCreate(url,title) {
+            $.get(url)
+                .done(function (response) {
+                    bootbox.dialog({
+                        title: title,
+                        message: response,
+                        size:'xl'
+                    })
+                    bindAttributeTypesDropdown();
+                    bindCollapsible();
+                    bindAddToListBtn();
+                    replacePrefix();
+                })
+        }
+
+        function bindAddToListBtn() {
+            $('.addToListBtn').click(function () {
+                var thisButton = $(this);
+                var prefix = 'TemplateAttributes[' + thisButton.closest('.form-group').prev().val() + '].';
+                console.log('prefix:'+prefix);
+                $.ajax({
+                    url: 'Templates/BlankListOption',
+                    data: { prefix: prefix },
+                    cache: false,
+                    success: function (html) {
+                        thisButton.parent().before(html);
+                    }
+                })
+            });
+        }
+
+        function replacePrefix() {
+            console.log('replacePrefix');
+            $('.dropdownSelect').each(function () {
+                var prefix = 'TemplateAttributes[' + $(this).prev().val() + ']';
+                console.log('prefix:' + prefix);
+                console.log($(this));
+                $(this).find('input[name^="[prefixHere]"').each(function () {
+                    console.log('found');
+                    $(this).attr('name', $(this).attr('name').replace('[prefixHere]', prefix));
+                })
+            })
+        }
+
+    </script>
+}
